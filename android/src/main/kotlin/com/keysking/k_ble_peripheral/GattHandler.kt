@@ -3,6 +3,7 @@ package com.keysking.k_ble_peripheral
 import android.bluetooth.*
 import android.bluetooth.BluetoothProfile.STATE_CONNECTED
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -190,7 +191,23 @@ class GattHandler(context: Context) : MethodCallHandler {
                 val device = DeviceDelegate.getDevice(address)
                 val kChar = CharacteristicDelegate.getKChar(entityId)
                 kChar.characteristic.value = value
-                gattServer.notifyCharacteristicChanged(device, kChar.characteristic, confirm)
+                if(Build.VERSION.SDK_INT >= 33) {
+                    if (device != null) {
+                        gattServer.notifyCharacteristicChanged(
+                            device,
+                            kChar.characteristic,
+                            confirm,
+                            value
+                        )
+                    }
+                }
+                else if (Build.VERSION.SDK_INT <= 21) {
+                    gattServer.notifyCharacteristicChanged(
+                        device,
+                        kChar.characteristic,
+                        confirm
+                    )
+                }
                 result.success(null)
             }
             "service/create" -> {
