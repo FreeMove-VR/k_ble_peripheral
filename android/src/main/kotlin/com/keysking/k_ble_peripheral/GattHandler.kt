@@ -190,22 +190,12 @@ class GattHandler(context: Context) : MethodCallHandler {
 
                 val device = DeviceDelegate.getDevice(address)
                 val kChar = CharacteristicDelegate.getKChar(entityId)
-                kChar.characteristic.value = value
-                if(Build.VERSION.SDK_INT >= 33) {
-                    if (device != null) {
-                        gattServer.notifyCharacteristicChanged(
-                            device,
-                            kChar.characteristic,
-                            confirm,
-                            value
-                        )
-                    }
-                }
-                else if (Build.VERSION.SDK_INT <= 21) {
+                if (device != null) {
                     gattServer.notifyCharacteristicChanged(
                         device,
                         kChar.characteristic,
-                        confirm
+                        confirm,
+                        value
                     )
                 }
                 result.success(null)
