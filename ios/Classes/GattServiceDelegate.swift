@@ -5,30 +5,24 @@ class GattServiceDelegate {
     private var services: [String: KGattService] = [:]
     private var gattServer: CBPeripheralManager!
 
-    /**
-     * Activate Service
-     */
-    func activate(entityId: String) {
+    private let SERVICE_TYPE_PRIMARY = 0
+
+    func getService(entityId: String) -> KGattService {
         guard let kService = services[entityId] else {
             fatalError("Not Found Gatt Service, may be the entityId is wrong.")
         }
-        gattServer.add(kService.service)
-        kService.activated = true
+        return kService
     }
 
-    /**
-     * Deactivate Service
-     */
-    func inactivate(entityId: String) {
+    func setServiceState(entityId: String, state: Bool) {
         guard let kService = services[entityId] else {
             fatalError("Not Found Gatt Service, may be the entityId is wrong.")
         }
-        gattServer.remove(kService.service)
-        kService.activated = false
+        kService.activated = state
     }
 
     func createKService(entityId: String, uuid: String, type: CBServiceType, characteristics: [KGattCharacteristic]) -> KGattService {
-        let service = CBMutableService(type: CBUUID(string: uuid), primary: type == .primary)
+        let service = CBMutableService(type: CBUUID(string: uuid), primary: type == SERVICE_TYPE_PRIMARY)
         characteristics.forEach {
             service.characteristics?.append($0.characteristic)
         }
